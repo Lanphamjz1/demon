@@ -1,9 +1,13 @@
 <?php
 
 // Kiểm tra và thiết lập đường dẫn lưu session
-if (!ini_get('session.save_path')) {
-    ini_set('session.save_path', '/tmp'); // Đường dẫn hợp lệ
+
+if (!is_dir('/tmp')) {
+    mkdir('/tmp', 0777, true); // Tạo thư mục nếu không tồn tại
 }
+ini_set('session.save_path', '/tmp'); // Đảm bảo đường dẫn lưu session
+
+
 
 // Xóa cookie session nếu Session ID không hợp lệ
 if (isset($_COOKIE[session_name()]) && !preg_match('/^[a-zA-Z0-9,-]{1,128}$/', $_COOKIE[session_name()])) {
