@@ -1,5 +1,5 @@
 <?php
-session_start(); // Nếu session đã bắt đầu, chỉ cần gọi session_start()
+session_start(); // Bắt đầu session
 
 // Kết nối cơ sở dữ liệu
 $host = 'test213.mysql.database.azure.com';
@@ -21,22 +21,29 @@ $Input_user = mysqli_real_escape_string($conn, $User);
 $Input_pass = mysqli_real_escape_string($conn, $Password);
 
 // Sử dụng Prepared Statements để tránh SQL Injection
-$sql = $conn->prepare("SELECT * FROM `account` WHERE User = ? AND Password = ?");
-$sql->bind_param("ss", $Input_user, $Input_pass);
+$sql = $conn->prepare("SELECT * FROM `account` WHERE User = ?");
+$sql->bind_param("s", $Input_user);
 $sql->execute();
 $result = $sql->get_result();
 
 if ($result->num_rows == 1) {
-    // Đăng nhập thành công
     $row = $result->fetch_assoc();
-    $_SESSION['User_name'] = $User;
-    
-    // Gán giá trị cố định cho id, bạn có thể thay đổi id này theo ý muốn
-    $_SESSION['id'] = 123;  // ID cố định, thay vì lấy từ cơ sở dữ liệu
-    $_SESSION['session_id'] = session_id();  // Lưu session ID
 
-    header('Location: index.php');  // Chuyển hướng đến trang chủ
-    exit;
+    // Kiểm tra mật khẩu bằng password_verify
+    if (password_verify($Input_pass, $row['Password'])) {
+        // Đăng nhập thành công
+        $_SESSION['User_name'] = $User;
+        $_SESSION['id'] = $row['id'];  // Lấy id người dùng từ cơ sở dữ liệu
+        $_SESSION['session_id'] = session_id();  // Lưu session ID
+
+        header('Location: index.php');  // Chuyển hướng đến trang chủ
+        exit;
+    } else {
+        // Đăng nhập thất bại
+        $_SESSION['error_message'] = "Tên đăng nhập hoặc mật khẩu không đúng.";
+        header('Location: login.html');  // Chuyển hướng về trang login
+        exit;
+    }
 } else {
     // Đăng nhập thất bại
     $_SESSION['error_message'] = "Tên đăng nhập hoặc mật khẩu không đúng.";
