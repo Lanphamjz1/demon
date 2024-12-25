@@ -7,7 +7,7 @@ if (!isset($_SESSION['User_name']) || !isset($_SESSION['id'])) {
     exit;
 }
 
-$id = $_SESSION['id'];  // Lấy id từ session (giá trị cố định)
+$id = $_SESSION['id'];  // Lấy id từ session
 
 echo "Chào mừng, " . $_SESSION['User_name'] . "!<br>";
 echo "ID người dùng là: " . $id . "<br>";
@@ -124,3 +124,6 @@ $scores_result = $stmt_scores->get_result();
     </div>
 </body>
 </html>
+<?php
+$conn->close(); // Đóng kết nối sau khi hoàn thành
+?>
