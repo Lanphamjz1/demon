@@ -2,34 +2,37 @@
   session_start();
   if(!isset($_SESSION['User_name']) and !isset($_SESSION['id'])) {
     header("Location: login.html");
+    exit;
   }
 ?>
 
 <?php
     $host = 'test213.mysql.database.azure.com';
-echo $username = 'fx';
-$password = 'Lanphamj21@@';
-$db_name = 'fx';
+    $username = 'fx';
+    $password = 'Lanphamj21@@';
+    $db_name = 'fx';
 
-
-    //tao ket noi
+    // Tạo kết nối
     $conn = new mysqli($host, $username, $password, $db_name);
     // Kiểm tra kết nối
     if ($conn->connect_error) {
         die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
     }
-$id = $_SESSION['id'];
-  $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
-  $stmt->bind_param("s", $id);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  $student = $result->fetch_assoc();
 
-  // Lấy bảng điểm sinh viên từ cơ sở dữ liệu
-  $stmt_scores = $conn->prepare("SELECT * FROM scores WHERE Student_id = ?");
-  $stmt_scores->bind_param("s", $id);
-  $stmt_scores->execute();
-  $scores_result = $stmt_scores->get_result();
+    $id = $_SESSION['id'];
+
+    // Lấy thông tin sinh viên
+    $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
+    $stmt->bind_param("s", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
+
+    // Lấy bảng điểm từ bảng 2022-2023_1
+    $stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_1` WHERE Student_id = ?");
+    $stmt_scores->bind_param("s", $id);
+    $stmt_scores->execute();
+    $scores_result = $stmt_scores->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -45,7 +48,7 @@ $id = $_SESSION['id'];
         <div class="header">
             <div class="header__title">
                 <div class="header__title__description" style="color: #fff;">
-                    TRƯƠNG ĐẠI HỌC HÀNG HẢI VIỆT NAM
+                    TRƯỜNG ĐẠI HỌC HÀNG HẢI VIỆT NAM
                 </div>
                 <div class="header__title__user">
                     <h3>Sinh Viên: <?php echo $student['Name']; ?></h3>
