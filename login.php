@@ -1,4 +1,14 @@
 <?php
+
+// Kiểm tra và thiết lập đường dẫn lưu session
+if (!ini_get('session.save_path')) {
+    ini_set('session.save_path', '/tmp'); // Đường dẫn hợp lệ
+}
+
+// Xóa cookie session nếu Session ID không hợp lệ
+if (isset($_COOKIE[session_name()]) && !preg_match('/^[a-zA-Z0-9,-]{1,128}$/', $_COOKIE[session_name()])) {
+    setcookie(session_name(), '', time() - 3600, '/'); // Xóa cookie session
+}
 session_start(); // Bắt đầu session
 
 // Kết nối cơ sở dữ liệu
