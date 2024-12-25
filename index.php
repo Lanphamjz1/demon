@@ -1,9 +1,16 @@
-<?php
-session_start(); // Bắt đầu phiên làm việc
+<?php 
+session_start(); // Bắt đầu session
 
-// Kiểm tra nếu người dùng đã đăng nhập hay chưa
-if (!isset($_SESSION['User_name']) || !isset($_SESSION['id'])) {
-    header("Location: login.html"); // Nếu chưa đăng nhập, chuyển hướng đến trang login
+// Kiểm tra nếu session không tồn tại hoặc không hợp lệ
+if (!isset($_SESSION['User_name']) || !isset($_SESSION['id']) || !isset($_SESSION['session_id'])) {
+    header("Location: login.html"); // Chuyển hướng về trang đăng nhập
+    exit;
+}
+
+// Kiểm tra lại session_id thủ công
+if ($_SESSION['session_id'] !== session_id()) {
+    session_destroy();  // Hủy session nếu session_id không hợp lệ
+    header("Location: login.html");  // Chuyển hướng về trang login
     exit;
 }
 
@@ -14,23 +21,20 @@ $password = 'Lanphamj21@@';
 $db_name = 'fx';
 
 $conn = new mysqli($host, $username, $password, $db_name);
-
-// Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
 }
 
-// Lấy thông tin sinh viên từ session
 $id = $_SESSION['id'];
 
-// Lấy thông tin sinh viên từ cơ sở dữ liệu
+// Lấy thông tin sinh viên
 $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
 $stmt->bind_param("s", $id);
 $stmt->execute();
 $result = $stmt->get_result();
 $student = $result->fetch_assoc();
 
-// Lấy bảng điểm từ cơ sở dữ liệu
+// Lấy bảng điểm từ bảng 2022-2023_2
 $stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_2` WHERE Student_id = ?");
 $stmt_scores->bind_param("s", $id);
 $stmt_scores->execute();
