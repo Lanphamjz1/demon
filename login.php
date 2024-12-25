@@ -1,9 +1,11 @@
 <?php
-session_start(); // Bắt đầu session
-
-// Thiết lập session_id thủ công (nếu cần)
-if (!isset($_SESSION['session_id'])) {
-    session_id('my_custom_session_id'); // Thiết lập session ID thủ công (có thể thay đổi ID này nếu cần)
+// Kiểm tra và khởi tạo session ID nếu chưa có
+if (session_status() == PHP_SESSION_NONE) {
+    // Chỉ gọi session_id nếu session chưa được khởi tạo
+    session_id('my_custom_session_id'); // Thay đổi session ID thủ công
+    session_start(); // Bắt đầu session
+} else {
+    session_start(); // Nếu session đã bắt đầu, chỉ cần gọi session_start()
 }
 
 // Kết nối cơ sở dữ liệu
