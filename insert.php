@@ -12,8 +12,8 @@ if (mysqli_connect_errno($conn)) {
 die('Failed to connect to MySQL: '.mysqli_connect_error());
 }
 
-$User = 'vuchien';
-$Password= '12345';
+$User = 'lanphamj';
+$Password= 'Lanphamj21@@';
 $id='1';
 
 if($stmt = mysqli_prepare($conn, "INSERT INTO account (User, Password, id) VALUES (? , ? , ?)")){
