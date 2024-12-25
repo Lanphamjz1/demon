@@ -1,10 +1,16 @@
 <?php 
-session_start();
-  if(!isset($_SESSION['User_name']) and !isset($_SESSION['id'])) {
-    header("Location: login.html");
-  }
+session_start(); // Bắt đầu session
 
+// Kiểm tra xem session có hợp lệ không
+if (!isset($_SESSION['User_name']) || !isset($_SESSION['id'])) {
+    header("Location: login.html"); // Chuyển hướng về trang đăng nhập nếu session không hợp lệ
+    exit;
+}
 
+$id = $_SESSION['id'];  // Lấy id từ session (giá trị cố định)
+
+echo "Chào mừng, " . $_SESSION['User_name'] . "!<br>";
+echo "ID người dùng là: " . $id . "<br>";
 
 // Kết nối cơ sở dữ liệu
 $host = 'test213.mysql.database.azure.com';
@@ -16,8 +22,6 @@ $conn = new mysqli($host, $username, $password, $db_name);
 if ($conn->connect_error) {
     die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
 }
-
-$id = $_SESSION['id'];
 
 // Lấy thông tin sinh viên
 $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
