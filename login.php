@@ -1,106 +1,47 @@
 <?php
-    session_start();
+session_start();
 
-
-   $host = 'test213.mysql.database.azure.com';
-echo $username = 'fx';
+$host = 'test213.mysql.database.azure.com';
+$username = 'fx';
 $password = 'Lanphamj21@@';
 $db_name = 'fx';
 
+// Tạo kết nối đến cơ sở dữ liệu
+$conn = new mysqli($host, $username, $password, $db_name);
 
-    //tao ket noi
-    $conn = new mysqli($host, $username, $password, $database);
-    // Kiểm tra kết nối
-    if ($conn->connect_error) {
-        die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
-    }
-    // else{
-    //    echo ("ket noi thanh cong");
-    // }
+// Kiểm tra kết nối
+if ($conn->connect_error) {
+    die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
+}
 
-    $User = $_POST["User"];
-    $Password = $_POST["Password"];
+// Lấy dữ liệu người dùng nhập vào từ form
+$User = $_POST["User"];
+$Password = $_POST["Password"];
 
-    //trich xuat du lieu nhap bang ham 
-    $Input_user = mysqli_real_escape_string($conn, $User);
-    $Input_pass = mysqli_real_escape_string($conn, $Password);
+// Lọc dữ liệu để tránh SQL Injection
+$Input_user = mysqli_real_escape_string($conn, $User);
+$Input_pass = mysqli_real_escape_string($conn, $Password);
 
-   $sql = "SELECT * FROM `account` WHERE User = '$Input_user' and Password = '$Input_pass'";
-   
+// Sử dụng Prepared Statements để tránh SQL Injection
+$sql = $conn->prepare("SELECT * FROM `account` WHERE User = ? AND Password = ?");
+$sql->bind_param("ss", $Input_user, $Input_pass);
+$sql->execute();
+$result = $sql->get_result();
 
-    $result = mysqli_query($conn, $sql);
+// Kiểm tra số lượng kết quả trả về
+if ($result->num_rows == 1) {
+    // Nếu đăng nhập thành công, lưu thông tin người dùng vào session
+    $_SESSION['User_name'] = $User;
+    $_SESSION['id'] = 1;
+    header('Location: index.php');  // Chuyển hướng đến trang chủ
+    exit;
+} else {
+    // Nếu đăng nhập thất bại, thông báo lỗi và quay lại trang login
+    $_SESSION['error_message'] = "Tên đăng nhập hoặc mật khẩu không đúng.";
+    header('Location: login.html');  // Chuyển hướng về trang đăng nhập
+    exit;
+}
 
-    // tắt hiển thị lỗi
-    ini_set('display_errors', '0');
-
-    $count = mysqli_num_rows($result);
-
-    if($count == 1){
-        
-        $_SESSION['User_name'] = $User;
-        $_SESSION['id'] = 1; 
-        header('Location: index.php');
-    } else{
-        header('Location: login.html');
-    }
+// Đóng kết nối
+$conn->close();
 ?>
-
- <?php
-    // // lay dulieu tu form dangnhap
-    // $User = $_POST["User"];
-    // $Password = $_POST["Password"];
-
-    // //tao ket noi
-    // $conn = mysqli_connect("localhost","root","") or die ;
-    // //tim csdl de lam viec
-    // mysqli_select_db($conn,"utt") or die;
-    // // cau lenh query
-    // echo $sql_insert_account ="SELECT * FROM `account` WHERE User = '$User' and Password = '$Password'";
-
-    // ini_set('display_errors', '0');
-    // //thuc hien truy van
-    // $result = mysqli_query($conn, $sql_insert_account);
-    // $count = mysqli_num_rows($result);
-
-    // if($count == 1){
-    //     $_SESSION['User_name'] = $User; 
-    //     header('Location: index.php');
-    // } else{
-    //     header('Location: login.html');
-    // }
-?>
-
-
-
-<?php 
-//     //lọc tên người dùng và mật khẩu để loại bỏ các ký tự đặc biệt.
-//     $User = filter_input(INPUT_POST, 'User', FILTER_SANITIZE_STRING);
-//     $Password = filter_input(INPUT_POST, 'Password', FILTER_SANITIZE_STRING);
-
-//     //tao ket noi
-//     $conn = mysqli_connect("localhost","root","") or die ;
-//     //tim csdl de lam viec
-//     mysqli_select_db($conn,"utt") or die;
-
-//     //làm sạch tên người dùng và mật khẩu trước khi chúng được sử dụng trong truy vấn SQL
-//    $User = mysqli_real_escape_string($conn, $User);
-//    echo  $User;
-//    $Password = mysqli_real_escape_string($conn, $Password);
-//    $Password;
-
-//     echo$sql_insert_account ="SELECT * FROM `account` WHERE User = '$User' and Password = '$Password'";
-
-//     ini_set('display_errors', '0');
-
-
-//     //thuc hien truy van
-//     $result = mysqli_query($conn, $sql_insert_account);
-//     $count = mysqli_num_rows($result);
-
-//     if($count == 1){
-//         $_SESSION['User_name'] = $User; 
-//         // header('Location: index.php');
-//     } else{
-//         // header('Location: login.html');
-//     }
-?>  
