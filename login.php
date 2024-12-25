@@ -1,6 +1,5 @@
 <?php
-
-    session_start(); // Nếu session đã bắt đầu, chỉ cần gọi session_start()
+session_start(); // Nếu session đã bắt đầu, chỉ cần gọi session_start()
 
 // Kết nối cơ sở dữ liệu
 $host = 'test213.mysql.database.azure.com';
@@ -31,8 +30,10 @@ if ($result->num_rows == 1) {
     // Đăng nhập thành công
     $row = $result->fetch_assoc();
     $_SESSION['User_name'] = $User;
-    $_SESSION['id'] = 1;  // Lưu ID người dùng vào session
     
+    // Gán giá trị cố định cho id, bạn có thể thay đổi id này theo ý muốn
+    $_SESSION['id'] = 123;  // ID cố định, thay vì lấy từ cơ sở dữ liệu
+    $_SESSION['session_id'] = session_id();  // Lưu session ID
 
     header('Location: index.php');  // Chuyển hướng đến trang chủ
     exit;
