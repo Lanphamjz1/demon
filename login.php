@@ -1,12 +1,6 @@
 <?php
-// Kiểm tra và khởi tạo session ID nếu chưa có
-if (session_status() == PHP_SESSION_NONE) {
-    // Chỉ gọi session_id nếu session chưa được khởi tạo
-    session_id('my_custom_session_id'); // Thay đổi session ID thủ công
-    session_start(); // Bắt đầu session
-} else {
+
     session_start(); // Nếu session đã bắt đầu, chỉ cần gọi session_start()
-}
 
 // Kết nối cơ sở dữ liệu
 $host = 'test213.mysql.database.azure.com';
@@ -37,7 +31,7 @@ if ($result->num_rows == 1) {
     // Đăng nhập thành công
     $row = $result->fetch_assoc();
     $_SESSION['User_name'] = $User;
-    $_SESSION['id'] = $row['id'];  // Lưu ID người dùng vào session
+    $_SESSION['id'] = 1;  // Lưu ID người dùng vào session
     $_SESSION['session_id'] = session_id(); // Lưu session ID vào session
 
     header('Location: index.php');  // Chuyển hướng đến trang chủ
