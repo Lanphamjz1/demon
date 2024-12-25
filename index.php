@@ -7,12 +7,7 @@ if (!isset($_SESSION['User_name']) || !isset($_SESSION['id']) || !isset($_SESSIO
     exit;
 }
 
-// Kiểm tra lại session_id thủ công
-if ($_SESSION['session_id'] !== session_id()) {
-    session_destroy();  // Hủy session nếu session_id không hợp lệ
-    header("Location: login.html");  // Chuyển hướng về trang login
-    exit;
-}
+
 
 // Kết nối cơ sở dữ liệu
 $host = 'test213.mysql.database.azure.com';
