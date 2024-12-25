@@ -1,38 +1,40 @@
-<?php 
-  session_start();
-  if(!isset($_SESSION['User_name']) and !isset($_SESSION['id'])) {
-    header("Location: login.html");
-    exit;
-  }
-?>
-
 <?php
-    $host = 'test213.mysql.database.azure.com';
-    $username = 'fx';
-    $password = 'Lanphamj21@@';
-    $db_name = 'fx';
+session_start(); // Bắt đầu phiên làm việc
 
-    // Tạo kết nối
-    $conn = new mysqli($host, $username, $password, $db_name);
-    // Kiểm tra kết nối
-    if ($conn->connect_error) {
-        die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
-    }
+// Kiểm tra nếu người dùng đã đăng nhập hay chưa
+if (!isset($_SESSION['User_name']) || !isset($_SESSION['id'])) {
+    header("Location: login.html"); // Nếu chưa đăng nhập, chuyển hướng đến trang login
+    exit;
+}
 
-    $id = $_SESSION['id'];
+// Kết nối cơ sở dữ liệu
+$host = 'test213.mysql.database.azure.com';
+$username = 'fx';
+$password = 'Lanphamj21@@';
+$db_name = 'fx';
 
-    // Lấy thông tin sinh viên
-    $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
-    $stmt->bind_param("s", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $student = $result->fetch_assoc();
+$conn = new mysqli($host, $username, $password, $db_name);
 
-    // Lấy bảng điểm từ bảng 2022-2023_1
-    $stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_2` WHERE Student_id = ?");
-    $stmt_scores->bind_param("s", $id);
-    $stmt_scores->execute();
-    $scores_result = $stmt_scores->get_result();
+// Kiểm tra kết nối
+if ($conn->connect_error) {
+    die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
+}
+
+// Lấy thông tin sinh viên từ session
+$id = $_SESSION['id'];
+
+// Lấy thông tin sinh viên từ cơ sở dữ liệu
+$stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
+$stmt->bind_param("s", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$student = $result->fetch_assoc();
+
+// Lấy bảng điểm từ cơ sở dữ liệu
+$stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_2` WHERE Student_id = ?");
+$stmt_scores->bind_param("s", $id);
+$stmt_scores->execute();
+$scores_result = $stmt_scores->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +86,6 @@
                 </div>
             </div>
 
-            <!-- Hiển thị bảng điểm -->
             <div class="container__scores">
                 <h3>BẢNG ĐIỂM CHI TIẾT</h3>
                 <table width="100%" align="center" border="1" style="border-collapse: collapse;">
@@ -99,7 +100,6 @@
                     </thead>
                     <tbody>
                         <?php
-                            // Lặp qua kết quả bảng điểm và hiển thị
                             while ($score = $scores_result->fetch_assoc()) {
                                 $total_score = ($score['Midterm_exam'] + $score['Final_exam']) / 2;
                                 echo "<tr>
