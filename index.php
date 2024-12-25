@@ -29,7 +29,7 @@
     $student = $result->fetch_assoc();
 
     // Lấy bảng điểm từ bảng 2022-2023_1
-    $stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_1` WHERE Student_id = ?");
+    $stmt_scores = $conn->prepare("SELECT * FROM `2022-2023_2` WHERE Student_id = ?");
     $stmt_scores->bind_param("s", $id);
     $stmt_scores->execute();
     $scores_result = $stmt_scores->get_result();
