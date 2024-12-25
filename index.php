@@ -19,7 +19,7 @@ $db_name = 'fx';
         die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
     }
 $id = $_SESSION['id'];
-  $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM students WHERE id = ?");
+  $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM student WHERE id = ?");
   $stmt->bind_param("s", $id);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -45,7 +45,7 @@ $id = $_SESSION['id'];
         <div class="header">
             <div class="header__title">
                 <div class="header__title__description" style="color: #fff;">
-                    TRƯƠNG ĐẠI HỌC CÔNG NGHỆ GTVT
+                    TRƯƠNG ĐẠI HỌC HÀNG HẢI VIỆT NAM
                 </div>
                 <div class="header__title__user">
                     <h3>Sinh Viên: <?php echo $student['Name']; ?></h3>
