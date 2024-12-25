@@ -32,7 +32,7 @@ if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
     $_SESSION['User_name'] = $User;
     $_SESSION['id'] = 1;  // Lưu ID người dùng vào session
-    $_SESSION['session_id'] = session_id(); // Lưu session ID vào session
+    
 
     header('Location: index.php');  // Chuyển hướng đến trang chủ
     exit;
