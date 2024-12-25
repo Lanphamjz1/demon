@@ -30,9 +30,10 @@ $result = $sql->get_result();
 
 // Kiểm tra số lượng kết quả trả về
 if ($result->num_rows == 1) {
-    // Nếu đăng nhập thành công, lưu thông tin người dùng vào session
+    // Nếu đăng nhập thành công, lấy ID người dùng từ cơ sở dữ liệu
+    $row = $result->fetch_assoc();
     $_SESSION['User_name'] = $User;
-    $_SESSION['id'] = 1;
+    $_SESSION['id'] = $row['id'];  // Lưu ID người dùng vào session
     header('Location: index.php');  // Chuyển hướng đến trang chủ
     exit;
 } else {
