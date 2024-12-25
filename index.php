@@ -18,286 +18,98 @@ $db_name = 'fx';
     if ($conn->connect_error) {
         die("Kết nối tới cơ sở dữ liệu thất bại: " . $conn->connect_error);
     }
+$id = $_SESSION['id'];
+  $stmt = $conn->prepare("SELECT Name, Department, Specialized, Class FROM students WHERE id = ?");
+  $stmt->bind_param("s", $id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $student = $result->fetch_assoc();
+
+  // Lấy bảng điểm sinh viên từ cơ sở dữ liệu
+  $stmt_scores = $conn->prepare("SELECT * FROM scores WHERE Student_id = ?");
+  $stmt_scores->bind_param("s", $id);
+  $stmt_scores->execute();
+  $scores_result = $stmt_scores->get_result();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/index.css">
     <title>Trang chủ</title>
 </head>
-
-
-<?php
-$stmt = $conn->prepare("Select * From student Where id = ?");
-$stmt->bind_param("s", $id);
-
-$id = $_SESSION['id'];
-
-$stmt->execute(); // Thêm dòng này
-
-$result = $stmt->get_result();
-$row = mysqli_fetch_assoc($result); //hien thi len form
-ini_set('display_errors', '0');
-
-?>
-
 <body>
     <div class="wraper">
         <div class="header">
             <div class="header__title">
                 <div class="header__title__description" style="color: #fff;">
-                    TRƯƠNG ĐẠI HỌC HÀNG HẢI VIỆT NAM
+                    TRƯƠNG ĐẠI HỌC CÔNG NGHỆ GTVT
                 </div>
-
                 <div class="header__title__user">
-                    <h3>Sinh Viên: <?php echo $row['Name'] ?></h3>
+                    <h3>Sinh Viên: <?php echo $student['Name']; ?></h3>
                 </div>
-
             </div>
             <div class="header__system">
-                <a href="" class="header__system__link">Trang chủ</a>
+                <a href="index.php" class="header__system__link">Trang chủ</a>
                 <a href="logout.php" class="header__system__link">Đăng xuất</a>
-                <a href="" class="header__system__link">hỏi đáp</a>
-                <a href="" class="header__system__link">Trợ giúp</a>
-                <select class="header__system__link-op" name="Product_Type" >
-                    <option value="">VN</option>
-                    <option value="">EN</option>
-                  </select>
             </div>
         </div>
 
         <div class="container">
-
             <div class="container__information">
                 <div class="container__information--col">
                     <div class="container__information--row"> 
                         <div class="container__information--title">Mã Sinh Viên:</div>
-                        <div class="container__information--id"><?php echo $row['Student_id'] ?></div>
+                        <div class="container__information--id"><?php echo $id; ?></div>
                     </div>
                     <div class="container__information--row"> 
                         <div class="container__information--title">Khoa: </div>
-                        <div class="container__information--department"><?php echo $row['Department'] ?></div>
+                        <div class="container__information--department"><?php echo $student['Department']; ?></div>
                     </div>
                     <div class="container__information--row"> 
-                        <div class="container__information--title">Học kì:</div>
-                       <select class="container__information--semester" name="Product_Type" >
-                            <option value="">2021_2022_1</option>
-                            <option value="">2021_2022_2</option>
-                            <option value="">2022_2023_1</option>
-                            <option value="">2022_2023_2</option>
-                          </select>
+                        <div class="container__information--title">Ngành:</div>
+                        <div class="container__information--specialized"><?php echo $student['Specialized']; ?></div>
                     </div>
                 </div>
-            
-
-            
                 <div class="container__information--col">
-                    <div class="container__information--row"> 
-                        <div class="container__information--title">Họ tên:</div>
-                        <div class="container__information--name"><?php echo $row['Name'] ?></div>
-                    </div>
-                    <div class="container__information--row"> 
-                        <div class="container__information--title">Ngành: </div>
-                        <div class="container__information--specialized"><?php echo $row['Specialized'] ?></div>
-                    </div>
-                    <div class="container__information--row"> 
-                        <div class="container__information--title">Lọc:</div>
-                        <select class="container__information--semester" name="Product_Type" >
-                            <option value="">Xem những học phần có diểm </option>
-                            <option value="">EN</option>
-                          </select>
-                    </div>
-                </div>
-
-                <div class="container__information--col">
-                    <div class="container__information--row"> 
-                        <div class="container__information--title">Trạng thái:</div>
-                        <div class="container__information--status">Đang học</div>
-                    </div>
                     <div class="container__information--row"> 
                         <div class="container__information--title">Lớp: </div>
-                        <div class="container__information--class"><?php echo $row['Class'] ?></div>
+                        <div class="container__information--class"><?php echo $student['Class']; ?></div>
                     </div>
                 </div>
-
             </div>
 
+            <!-- Hiển thị bảng điểm -->
             <div class="container__scores">
+                <h3>BẢNG ĐIỂM CHI TIẾT</h3>
                 <table width="100%" align="center" border="1" style="border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>Mã Môn Học</th>
+                            <th>Số Tín Chỉ</th>
+                            <th>Điểm Giữa Kỳ</th>
+                            <th>Điểm Cuối Kỳ</th>
+                            <th>Tổng Điểm</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                      <tr>
-                        <td class="container__scores__header">Năm học</td>
-                        <td class="container__scores__header">Học kỳ</td>
-                        <td class="container__scores__header">TBTL Hệ 10 N1</td>
-                        <td class="container__scores__header">TBTL Hệ 10 N2</td>
-                        <td class="container__scores__header">TBTL Hệ 4 N1</td>
-                        <td class="container__scores__header">TBTL Hệ 4 N2</td>
-                        <td class="container__scores__header">Số TCTL N1</td>
-                        <td class="container__scores__header">Số TCTL N2</td>
-                        <td class="container__scores__header">TBC Hệ 10 N1</td>
-                        <td class="container__scores__header">TBC Hệ 10 N2</td>
-                        <td class="container__scores__header">TBC Hệ4 N1</td>
-                        <td class="container__scores__header">TBC Hệ4 N2</td>
-                        <td class="container__scores__header">Số TC N1</td>
-                        <td class="container__scores__header">Số TC N2</td>
-                      </tr>
-                      <tr>
-                        <td class="container__scores__row">2021_2022</td>
-                        <td class="container__scores__row">1</td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                      </tr>
-                      <tr>
-                        <td class="container__scores__row">2021_2022</td>
-                        <td class="container__scores__row">2</td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                      </tr>
-                      <tr>
-                        <td class="container__scores__row">2021_2022</td>
-                        <td class="container__scores__row">Cả năm</td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                      </tr>
-                      <tr>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">Toàn Khóa</td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">8.53</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">3.66</td>
-                        <td class="container__scores__row"></td>
-                        <td class="container__scores__row">16</td>
-                        <td class="container__scores__row"></td>
-                      </tr>
-                      <tr>
+                        <?php
+                            // Lặp qua kết quả bảng điểm và hiển thị
+                            while ($score = $scores_result->fetch_assoc()) {
+                                $total_score = ($score['Midterm_exam'] + $score['Final_exam']) / 2;
+                                echo "<tr>
+                                        <td>{$score['Subject_id']}</td>
+                                        <td>{$score['Subject_credits']}</td>
+                                        <td>{$score['Midterm_exam']}</td>
+                                        <td>{$score['Final_exam']}</td>
+                                        <td>$total_score</td>
+                                      </tr>";
+                            }
+                        ?>
                     </tbody>
-                  </table>
-
-                  <br>
-
-                  <?php
-                  // Chuẩn bị câu lệnh SQL
-                  $stmt = $conn->prepare("SELECT * FROM `2022-2023_2` WHERE id = ?");
-
-                  // Gán giá trị cho tham số
-                  $id = $_SESSION['id'];
-
-                  // Ràng buộc tham số
-                  $stmt->bind_param("s", $id);
-
-                  // Thực thi câu lệnh
-                  $stmt->execute();
-
-                  // Lấy kết quả
-                  $result = $stmt->get_result();
-
-                  // Đếm số bản ghi
-                  $tong_bg = $result->num_rows;
-
-                  $stt = 0;
-                  while ($row = $result->fetch_object()) {
-                      $stt++;
-                      $Subject_id[$stt] = $row->Subject_id;
-                      $Subject_name[$stt] = $row->Subject_name;
-                      $Subject_credits[$stt] = $row->Subject_credits;
-                      $Subject_times[$stt] = $row->Subject_times;
-                      $Student_id[$stt] = $row->Student_id;
-                      $Subject_attendance[$stt] = $row->Subject_attendance;
-                      $Midterm_exam[$stt] = $row->Midterm_exam;
-                      $Final_exam[$stt] = $row->Final_exam;
-                      $Discuss[$stt] = $row->Discuss;
-                  }
-                  ?>
-
-                  <h3>BẢNG ĐIỂM CHI TIẾT</h3>
-                  <table width="100%" align="center" border="1" style="border-collapse: collapse;">
-                    <tbody>
-                      <tr>
-                        <td class="container__scores__header">STT</td>
-                        <td class="container__scores__header">Mã Học phần</td>
-                        <td class="container__scores__header">Số Tc</td>
-                        <td class="container__scores__header">Lần học</td>
-                        <td class="container__scores__header">Lần thi</td>
-                        <td class="container__scores__header">Điểm thứ</td>
-                        <td class="container__scores__header">Là điểm tổng kết môn</td>
-                        <td class="container__scores__header">Đánh giá</td>
-                        <td class="container__scores__header">Mã sinh viên</td>
-                        <td class="container__scores__header">Chuyên cần</td>
-                        <td class="container__scores__header">Kiểm tra GK</td>
-                        <td class="container__scores__header">Thực hành</td>
-                        <td class="container__scores__header">Thi Kết thúc</td>
-                        <td class="container__scores__header">Thảo luận</td>
-                        <td class="container__scores__header">Tổng kết HP</td>
-                      </tr>
-
-                      <?php
-                        for($i=1;$i<=$tong_bg;$i++)
-                        {
-                      ?>
-                      <tr>
-                        <td class="container__scores__row"><?php echo $i ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_id[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_credits[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_times[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_times[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_times[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_name[$i]?></td>
-                        <td class="container__scores__row"><?php ?></td>
-                        <td class="container__scores__row"><?php echo $Student_id[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Subject_attendance[$i] ?></td>
-                        <td class="container__scores__row"><?php echo $Midterm_exam[$i]?></td>
-                        <td class="container__scores__row"><?php ?></td>
-                        <td class="container__scores__row"><?php echo $Final_exam[$i]?></td>
-                        <td class="container__scores__row"><?php echo  $Discuss[$i]?></td>
-                        <td class="container__scores__row"><?php echo ($Final_exam[$i] + $Discuss[$i] + $Midterm_exam[$i] + $Subject_attendance[$i]) / 4?></td>
-                      </tr>
-
-                      <?php
-                        }
-                      ?>
-                    </tbody>
-                  </table>
-                  
+                </table>
             </div>
         </div>
 
@@ -306,9 +118,6 @@ ini_set('display_errors', '0');
                 Đường dây nóng: 02435528978
             </div>
         </div>
-
-
     </div>
 </body>
-
 </html>
