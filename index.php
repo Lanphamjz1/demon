@@ -1,11 +1,8 @@
 <?php 
-session_start(); // Bắt đầu session
-
-// Kiểm tra nếu session không tồn tại hoặc không hợp lệ
-if (!isset($_SESSION['User_name']) || !isset($_SESSION['id']) || !isset($_SESSION['session_id'])) {
-    header("Location: login.html"); // Chuyển hướng về trang đăng nhập
-    exit;
-}
+session_start();
+  if(!isset($_SESSION['User_name']) and !isset($_SESSION['id'])) {
+    header("Location: login.html");
+  }
 
 
 
